@@ -1,0 +1,31 @@
+services:
+  3proxy:
+    image: ghcr.io/tarampampam/3proxy:2
+    restart: unless-stopped
+    container_name: vw-3proxy
+    # Custom Lua entrypoint builds a two-listener config (3128 auth / 3129 ACL)
+    # from env vars, keeping secrets out of the image and repo.
+    command: ["/bin/lua", "/entrypoint.lua"]
+    volumes:
+      - ./entrypoint.lua:/entrypoint.lua:ro
+    environment:
+      PROXY_LOGIN: ${PROXY_LOGIN:?set PROXY_LOGIN in proxy/.env}
+      PROXY_PASSWORD: ${PROXY_PASSWORD:?set PROXY_PASSWORD in proxy/.env}
+      PROXY_PORT: ${PROXY_PORT:-3128}
+      PROXY_BROWSER_PORT: ${PROXY_BROWSER_PORT:-3129}
+      # Source IP/subnet allowed to use the unauthenticated browser port.
+      # Defaults to the proxy host's own loopback only (safe by default).
+      PROXY_BROWSER_ALLOW_IP: ${PROXY_BROWSER_ALLOW_IP:-127.0.0.1/32}
+    ports:
+      - "3128:3128/tcp"          # HTTP proxy, basic auth (curl / Nuclei / WPScan / Guzzle)
+      - "127.0.0.1:3129:3129/tcp" # HTTP proxy, no auth, reachable only via host loopback
+    ulimits:
+      nofile:
+        soft: 20000
+        hard: 20000
+    healthcheck:
+      test: ["CMD", "portcheck", "3128"]
+      interval: 15s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
