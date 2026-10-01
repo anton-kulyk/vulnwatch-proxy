@@ -28,7 +28,7 @@ local proxy_login      = getenv("PROXY_LOGIN", "")
 local proxy_password   = getenv("PROXY_PASSWORD", "")
 local proxy_port       = getenv("PROXY_PORT", "3128")
 local browser_port     = getenv("PROXY_BROWSER_PORT", "3129")
-local browser_allow_ip = getenv("PROXY_BROWSER_ALLOW_IP", "0.0.0.0/0")
+local browser_allow_ip = getenv("PROXY_BROWSER_ALLOW_IP", "127.0.0.1/32")
 
 local lines = {}
 local function add(s) lines[#lines + 1] = s end

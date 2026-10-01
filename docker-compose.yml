@@ -18,7 +18,11 @@ services:
       PROXY_BROWSER_ALLOW_IP: ${PROXY_BROWSER_ALLOW_IP:-127.0.0.1/32}
     ports:
       - "3128:3128/tcp"          # HTTP proxy, basic auth (curl / Nuclei / WPScan / Guzzle)
-      - "127.0.0.1:3129:3129/tcp" # HTTP proxy, no auth, reachable only via host loopback
+      # 3129 is unauthenticated. It is exposed externally ONLY so that scanner
+      # clients (e.g. the VulnWatch VPS / other proxies) can reach it. The
+      # entrypoint.lua ACL (PROXY_BROWSER_ALLOW_IP) MUST be set to the client
+      # IP/subnet in .env, otherwise anyone on the internet could use it.
+      - "3129:3129/tcp"          # HTTP proxy, no auth, ACL-locked (see entrypoint.lua)
     ulimits:
       nofile:
         soft: 20000
