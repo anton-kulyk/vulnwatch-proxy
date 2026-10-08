@@ -28,7 +28,7 @@ services:
         soft: 20000
         hard: 20000
     healthcheck:
-      test: ["CMD", "portcheck", "3128"]
+      test: ["CMD", "portcheck", "--port", "3128"]
       interval: 15s
       timeout: 3s
       retries: 5
